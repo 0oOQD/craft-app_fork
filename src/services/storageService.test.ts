@@ -8,9 +8,9 @@ const { refMock, uploadBytesMock, getDownloadURLMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('firebase/storage', () => ({
-  ref: (...args: unknown[]) => refMock(...args),
-  uploadBytes: (...args: unknown[]) => uploadBytesMock(...args),
-  getDownloadURL: (...args: unknown[]) => getDownloadURLMock(...args),
+  ref: (...args: unknown[]) => refMock(...(args as [])),
+  uploadBytes: (...args: unknown[]) => uploadBytesMock(...(args as [])),
+  getDownloadURL: (...args: unknown[]) => getDownloadURLMock(...(args as [])),
 }));
 
 vi.mock('./firebase', () => ({
@@ -45,7 +45,7 @@ describe('uploadCraftPhoto', () => {
     const file = new File(['image'], 'my-knitting-project.png', { type: 'image/png' });
     await uploadCraftPhoto(file, 'user-1');
 
-    const [, path] = refMock.mock.calls[0] as [string, string];
+    const [, path] = refMock.mock.calls[0] as unknown as [string, string];
     expect(path).toMatch(/my-knitting-project\.png$/);
   });
 });
