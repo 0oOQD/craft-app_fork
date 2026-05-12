@@ -3,7 +3,6 @@ import { CraftForm } from '../components/CraftForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { useCrafts } from '../hooks/useCrafts';
 import type { Craft, CraftInput, CraftStatus } from '../types/Craft';
-import type { CraftInput, CraftStatus } from '../types/Craft';
 import { CircularProgress } from '../components/ProgressCircle';
 import { useEffect, useState } from 'react';
 
@@ -11,20 +10,26 @@ export const CraftDetailPage = () => {
   const { craftId } = useParams();
   const navigate = useNavigate();
   const { crafts, editCraft, moveCraft, removeCraft } = useCrafts();
+
   const [selectedInspirationCraft, setSelectedInspirationCraft] = useState<Craft | null>(null);
+  const [editingCraft, setEditingCraft] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const craft = crafts.find((currentCraft) => currentCraft.id === craftId);
+
   const [progress, setProgress] = useState(0);
   const [progressReady, setProgressReady] = useState(false);
+
   useEffect(() => {
-  if (craft) {
+    if (craft) {
       setProgress(craft.progress ?? 0);
-      setProgressReady(true); 
+      setProgressReady(true);
+      setCurrentPhotoIndex(0);
     }
   }, [craft]);
 
   useEffect(() => {
-    if (!craft || !progressReady) return; 
+    if (!craft || !progressReady) return;
 
     const timeout = setTimeout(() => {
       void editCraft(craft.id, {
@@ -50,13 +55,9 @@ export const CraftDetailPage = () => {
     );
   }
 
-  
-
-  
-
   const handleSubmit = async (input: CraftInput) => {
     await editCraft(craft.id, input);
-    navigate(`/${input.status === 'work-in-progress' || input.status === 'completed' ? 'work' : input.status}`);
+    setEditingCraft(false);
   };
 
   const handleMove = async (status: CraftStatus) => {
@@ -69,6 +70,18 @@ export const CraftDetailPage = () => {
     navigate('/');
   };
 
+  const goToPreviousPhoto = () => {
+    setCurrentPhotoIndex((currentIndex) =>
+      currentIndex === 0 ? craft.photos.length - 1 : currentIndex - 1,
+    );
+  };
+
+  const goToNextPhoto = () => {
+    setCurrentPhotoIndex((currentIndex) =>
+      currentIndex === craft.photos.length - 1 ? 0 : currentIndex + 1,
+    );
+  };
+
   const folderRoute = craft.status === 'work-in-progress' || craft.status === 'completed' ? 'work' : craft.status;
 
   const sources =
@@ -78,6 +91,8 @@ export const CraftDetailPage = () => {
         ? [{ id: 'source-url', type: 'external' as const, url: craft.sourceUrl }]
         : [];
 
+  const currentPhoto = craft.photos[currentPhotoIndex];
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <Link className="text-sm font-bold text-amber-800 hover:text-amber-950" to={`/${folderRoute}`}>
@@ -86,9 +101,19 @@ export const CraftDetailPage = () => {
 
       <section className="mt-6 grid gap-8 lg:grid-cols-[1fr_0.9fr]">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-4xl font-black tracking-tight text-stone-950">{craft.title}</h1>
-            <StatusBadge status={craft.status} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl font-black tracking-tight text-stone-950">{craft.title}</h1>
+              <StatusBadge status={craft.status} />
+            </div>
+
+            <button
+              className="rounded-full bg-stone-900 px-5 py-2 font-bold text-white hover:bg-stone-700"
+              type="button"
+              onClick={() => setEditingCraft(true)}
+            >
+              Edit craft
+            </button>
           </div>
 
           <p className="mt-4 whitespace-pre-wrap text-lg leading-8 text-stone-700">{craft.description}</p>
@@ -149,24 +174,62 @@ export const CraftDetailPage = () => {
             )}
           </section>
 
-          <section className="mt-8 grid gap-4 sm:grid-cols-2">
-            {craft.photos.map((photo) => (
-              <img className="h-72 w-full rounded-3xl object-cover shadow-sm" key={photo.id} src={photo.url} alt={photo.alt} />
-            ))}
+          <section className="mt-8 rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+            <h2 className="mb-4 text-2xl font-bold text-stone-950">Photos</h2>
+
+            {currentPhoto ? (
+              <div>
+                <div className="relative overflow-hidden rounded-3xl bg-stone-100">
+                  <img
+                    className="h-[34rem] w-full object-contain"
+                    src={currentPhoto.url}
+                    alt={currentPhoto.alt}
+                  />
+
+                  {craft.photos.length > 1 ? (
+                    <>
+                      <button
+                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-4 py-3 text-2xl font-black text-stone-900 shadow hover:bg-white"
+                        type="button"
+                        onClick={goToPreviousPhoto}
+                        aria-label="Previous photo"
+                      >
+                        ←
+                      </button>
+
+                      <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-4 py-3 text-2xl font-black text-stone-900 shadow hover:bg-white"
+                        type="button"
+                        onClick={goToNextPhoto}
+                        aria-label="Next photo"
+                      >
+                        →
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+
+                {craft.photos.length > 1 ? (
+                  <p className="mt-3 text-center text-sm font-semibold text-stone-500">
+                    {currentPhotoIndex + 1} of {craft.photos.length}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-stone-600">No photos added yet.</p>
+            )}
           </section>
         </div>
 
         <aside className="space-y-4">
-          <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm flex items-center gap-4">
-            <CircularProgress
-              value={progress}
-              onChange={setProgress}
-            />
+          <section className="flex items-center gap-4 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
+            <CircularProgress value={progress} onChange={setProgress} />
             <div>
               <p className="font-bold text-stone-900">Progress</p>
               <p className="text-sm text-stone-500">Drag the ring to update</p>
             </div>
           </section>
+
           <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-bold text-stone-950">Move craft</h2>
             <div className="mt-4 grid gap-2">
@@ -184,10 +247,31 @@ export const CraftDetailPage = () => {
               </button>
             </div>
           </section>
-
-          <CraftForm initialCraft={craft} submitLabel="Update craft" onSubmit={handleSubmit} />
         </aside>
       </section>
+
+      {editingCraft ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 py-8">
+          <div className="max-h-full w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-3xl font-black tracking-tight text-stone-950">Edit craft</h2>
+                <p className="mt-1 text-sm text-stone-500">Update the craft details, sources, materials, and photos.</p>
+              </div>
+
+              <button
+                className="rounded-full bg-stone-900 px-4 py-2 text-sm font-bold text-white hover:bg-stone-700"
+                type="button"
+                onClick={() => setEditingCraft(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <CraftForm initialCraft={craft} submitLabel="Update craft" onSubmit={handleSubmit} />
+          </div>
+        </div>
+      ) : null}
 
       {selectedInspirationCraft ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 py-8">
