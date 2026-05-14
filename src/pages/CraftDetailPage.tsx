@@ -79,7 +79,7 @@ export const CraftDetailPage = () => {
   };
 
   const photosPerLine = 3;
-  const lastPhotoViewIndex = (() => {    
+  const lastPhotoViewIndex = (() => {
     const remainder = craft.photos.length % photosPerLine;
     return craft.photos.length - (remainder === 0 ? photosPerLine : remainder)
   })();
@@ -106,8 +106,6 @@ export const CraftDetailPage = () => {
         : [];
 
   const currentPhotos = craft.photos.slice(currentPhotoIndex, currentPhotoIndex + photosPerLine);
-
-  console.log(currentPhotoIndex);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -145,6 +143,7 @@ export const CraftDetailPage = () => {
                     {
                       currentPhotos.map((photo) => (
                         <img
+                          key={`images-${photo.url}`}
                           className="h-[34rem] max-h-50 m-1 max-w-1/3 object-contain"
                           src={photo.url}
                           alt={photo.alt}
