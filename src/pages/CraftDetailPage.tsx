@@ -135,15 +135,17 @@ export const CraftDetailPage = () => {
 
               <div>
                 <div className="relative overflow-hidden rounded-3xl bg-stone-100">
-                  {
-                    currentPhotos.map((photo) => (
-                      <img
-                        className="h-[34rem] w-full object-contain"
-                        src={photo.url}
-                        alt={photo.alt}
-                      />
-                    ))
-                  }
+                  <div className="flex justify-around ml-10 mr-10">
+                    {
+                      currentPhotos.map((photo) => (
+                        <img
+                          className="h-[34rem] max-h-50 m-1 max-w-1/3 object-contain"
+                          src={photo.url}
+                          alt={photo.alt}
+                        />
+                      ))
+                    }
+                  </div>
 
                   {craft.photos.length > photosPerLine ? (
                     <>
