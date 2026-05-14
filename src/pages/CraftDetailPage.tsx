@@ -78,15 +78,21 @@ export const CraftDetailPage = () => {
     navigate('/');
   };
 
+  const photosPerLine = 3;
+  const lastPhotoViewIndex = (() => {    
+    const remainder = craft.photos.length % photosPerLine;
+    return craft.photos.length - (remainder === 0 ? photosPerLine : remainder)
+  })();
+
   const goToPreviousPhoto = () => {
     setCurrentPhotoIndex((currentIndex) =>
-      currentIndex === 0 ? craft.photos.length - 1 : currentIndex - 1,
+      currentIndex === 0 ? lastPhotoViewIndex : currentIndex - photosPerLine,
     );
   };
 
   const goToNextPhoto = () => {
     setCurrentPhotoIndex((currentIndex) =>
-      currentIndex === craft.photos.length - 1 ? 0 : currentIndex + 1,
+      currentIndex === lastPhotoViewIndex ? 0 : currentIndex + photosPerLine,
     );
   };
 
@@ -99,9 +105,9 @@ export const CraftDetailPage = () => {
         ? [{ id: 'source-url', type: 'external' as const, url: craft.sourceUrl }]
         : [];
 
-  // const currentPhoto = craft.photos[currentPhotoIndex];
-  const photosPerLine = 3;
   const currentPhotos = craft.photos.slice(currentPhotoIndex, currentPhotoIndex + photosPerLine);
+
+  console.log(currentPhotoIndex);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
