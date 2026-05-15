@@ -28,7 +28,7 @@ export interface Craft {
   photos: CraftPhoto[];
   status: CraftStatus;
   sourceUrl?: string;
-  sources: CraftSource[];
+  sources?: CraftSource[];
   createdAt: string;
   updatedAt: string;
   progress?: number;
@@ -42,7 +42,7 @@ export interface CraftInput {
   photos: CraftPhoto[];
   status: CraftStatus;
   sourceUrl?: string;
-  sources: CraftSource[];
+  sources?: CraftSource[];
   progress?: number;
   isPublic: boolean;
 }
