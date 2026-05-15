@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /crafts/{craftId} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        request.auth.token.email in resource.data.sharedWith
+      );
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    match /friendships/{friendshipId} {
+      allow read: if request.auth != null && (
+        resource.data.fromUserId == request.auth.uid ||
+        resource.data.toEmail == request.auth.token.email
+      );
+      allow create: if request.auth != null && request.resource.data.fromUserId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.fromUserId == request.auth.uid;
+    }
+  }
+}

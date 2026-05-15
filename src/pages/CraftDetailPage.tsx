@@ -2,6 +2,8 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { CraftForm } from '../components/CraftForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { useCrafts } from '../hooks/useCrafts';
+import { useFriends } from '../hooks/useFriends';
+import { updateSharedWith } from '../services/craftService';
 import type { Craft, CraftInput, CraftStatus } from '../types/Craft';
 import { CircularProgress } from '../components/ProgressCircle';
 import { useEffect, useState } from 'react';
@@ -10,6 +12,7 @@ export const CraftDetailPage = () => {
   const { craftId } = useParams();
   const navigate = useNavigate();
   const { crafts, editCraft, moveCraft, removeCraft } = useCrafts();
+  const { friends } = useFriends();
 
   const [selectedInspirationCraft, setSelectedInspirationCraft] = useState<Craft | null>(null);
   const [editingCraft, setEditingCraft] = useState(false);
@@ -76,6 +79,14 @@ export const CraftDetailPage = () => {
   const handleDelete = async () => {
     await removeCraft(craft.id);
     navigate('/');
+  };
+
+  const toggleShare = async (email: string) => {
+    const current = craft.sharedWith ?? [];
+    const next = current.includes(email)
+      ? current.filter((e) => e !== email)
+      : [...current, email];
+    await updateSharedWith(craft.id, next);
   };
 
   const photosPerLine = 3;
@@ -278,6 +289,33 @@ export const CraftDetailPage = () => {
                 Delete Craft
               </button>
             </div>
+          </section>
+
+          <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
+            <h2 className="text-xl font-bold text-stone-950">Share</h2>
+            {friends.length === 0 ? (
+              <p className="mt-3 text-sm text-stone-500">
+                Add friends on the Friends page to share this craft.
+              </p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {friends.map((friend) => {
+                  const isShared = craft.sharedWith?.includes(friend.toEmail) ?? false;
+                  return (
+                    <li key={friend.id} className="flex items-center justify-between">
+                      <span className="truncate text-sm text-stone-700">{friend.toEmail}</span>
+                      <button
+                        className={`ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold transition ${isShared ? 'bg-amber-700 text-white hover:bg-amber-900' : 'border border-stone-300 text-stone-700 hover:bg-stone-100'}`}
+                        type="button"
+                        onClick={() => void toggleShare(friend.toEmail)}
+                      >
+                        {isShared ? 'Shared ✓' : 'Share'}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
         </aside>
       </section>

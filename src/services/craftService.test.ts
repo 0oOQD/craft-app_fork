@@ -48,6 +48,7 @@ describe('craftService', () => {
       materials: ['linen'],
       photos: [],
       status: 'work-in-progress',
+      isPublic: false,
     };
 
     await expect(createCraft('user-1', input)).resolves.toBe('new-craft');

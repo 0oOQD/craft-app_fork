@@ -12,6 +12,7 @@ const craft: Craft = {
   materials: ['Cotton squares', 'Thread'],
   photos: [{ id: 'photo-1', url: 'https://example.com/quilt.jpg', alt: 'Quilt' }],
   status: 'work-in-progress',
+  isPublic: false,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-02T00:00:00.000Z',
 };

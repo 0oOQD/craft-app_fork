@@ -67,6 +67,7 @@ const mapCraft = (id: string, data: DocumentData): Craft => ({
   sources: mapSources(data),
   progress: typeof data.progress === 'number' ? data.progress : 0,
   isPublic: data.isPublic === true,
+  sharedWith: Array.isArray(data.sharedWith) ? data.sharedWith.map(String) : [],
   createdAt: data.createdAt?.toDate?.().toISOString?.() ?? new Date().toISOString(),
   updatedAt: data.updatedAt?.toDate?.().toISOString?.() ?? new Date().toISOString(),
 });
@@ -129,4 +130,25 @@ export const deleteCraft = async (craftId: string): Promise<void> => {
   } catch (error) {
     throw error instanceof Error ? error : new Error('Could not delete craft.');
   }
+};
+
+export const updateSharedWith = async (craftId: string, sharedWith: string[]): Promise<void> => {
+  try {
+    await updateDoc(doc(db, 'crafts', craftId), { sharedWith });
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Could not update sharing.');
+  }
+};
+
+export const subscribeToSharedCrafts = (
+  email: string,
+  callback: (crafts: Craft[]) => void,
+  onError: (message: string) => void,
+): (() => void) => {
+  const q = query(craftsCollection, where('sharedWith', 'array-contains', email));
+  return onSnapshot(
+    q,
+    (snapshot) => callback(snapshot.docs.map((d) => mapCraft(d.id, d.data()))),
+    (err) => onError(err.message),
+  );
 };

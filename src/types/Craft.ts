@@ -33,6 +33,7 @@ export interface Craft {
   updatedAt: string;
   progress?: number;
   isPublic: boolean;
+  sharedWith?: string[];
 }
 
 export interface CraftInput {
