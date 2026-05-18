@@ -138,24 +138,6 @@ export const CraftForm = ({ initialCraft, submitLabel, onSubmit }: CraftFormProp
     setPhotos((currentPhotos) => currentPhotos.filter((photo) => photo.id !== photoId));
   };
 
-  // const cleanSources = (): CraftSource[] =>
-  //   sources
-  //     .map((source) => {
-  //       if (source.type === 'external') {
-  //         return {
-  //           ...source,
-  //           url: source.url.trim(),
-  //           label: source.label?.trim() || undefined,
-  //         };
-  //       }
-
-  //       return source;
-  //     })
-  //     .filter((source) => {
-  //       if (source.type === 'external') return Boolean(source.url);
-  //       return Boolean(source.craftId);
-  //     });
-
   const cleanSources = (): CraftSource[] =>
     sources
       .map((source) => {
@@ -223,7 +205,7 @@ export const CraftForm = ({ initialCraft, submitLabel, onSubmit }: CraftFormProp
 
       <label className="block">
         <span className="text-sm font-bold text-stone-700">Description / vision</span>
-        <textarea className="mt-2 min-h-36 w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-amber-700" value={description} 
+        <textarea className="mt-2 min-h-16 w-full rounded-2xl border border-stone-300 px-4 py-3 outline-none focus:border-amber-700" value={description} 
         onChange={(event) => setDescription(event.target.value)} placeholder="What are you making? What look are you going for?" />
       </label>
 
@@ -371,7 +353,7 @@ export const CraftForm = ({ initialCraft, submitLabel, onSubmit }: CraftFormProp
 
       <div className="flex items-center justify-between rounded-2xl border border-stone-200 px-4 py-3">
         <div>
-          <span className="text-sm font-bold text-stone-700">Visibility</span>
+          <span className="text-sm font-bold text-stone-700">Visibility: {isPublic ? 'Public' : 'Private'}</span>
           <p className="text-xs text-stone-500">{isPublic ? 'Anyone can view this craft' : 'Only you can see this craft'}</p>
         </div>
         <button
