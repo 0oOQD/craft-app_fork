@@ -16,6 +16,7 @@ export const CraftDetailPage = () => {
 
   const [selectedInspirationCraft, setSelectedInspirationCraft] = useState<Craft | null>(null);
   const [editingCraft, setEditingCraft] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const craft = crafts.find((currentCraft) => currentCraft.id === craftId);
@@ -284,7 +285,7 @@ export const CraftDetailPage = () => {
 
               <button
                 className="rounded-full border border-red-200 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
-                onClick={() => void handleDelete()}
+                onClick={() => setShowDeleteConfirm(true)}
               >
                 Delete Craft
               </button>
@@ -319,6 +320,36 @@ export const CraftDetailPage = () => {
           </section>
         </aside>
       </section>
+
+
+      {showDeleteConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
+            <h2 className="text-2xl font-black text-stone-950">Delete this craft?</h2>
+            <p className="mt-3 text-stone-600">
+              Are you sure you want to delete "{craft.title}"? This action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="rounded-full border border-stone-300 px-4 py-2 font-semibold text-stone-700 hover:bg-stone-100"
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="rounded-full bg-red-700 px-4 py-2 font-bold text-white hover:bg-red-800"
+                type="button"
+                onClick={() => void handleDelete()}
+              >
+                Yes, delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {editingCraft ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 py-8">
